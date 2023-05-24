@@ -334,6 +334,22 @@ class TouchProcessorTest {
     }
 
     @Test
+    public void twoDifferentKeyTouches_whenProcess_thenReturnTwoIncompleteTrips() {
+        // GIVEN
+        String fileName = "twoDifferentKeyTouches.csv";
+        File inputFile = getInputFile(fileName);
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
+
+        // WHEN
+        touchProcessor.process(inputFile, tripOutputFile);
+
+        // THEN
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
+    }
+
+    @Test
     public void givenTwoTrips_whenProcess_thenReturnTwoTrips() {
         // GIVEN
         String fileName = "twoTrips.csv";

@@ -115,26 +115,24 @@ public class TouchProcessor {
 
                     linePair.add(line);
 
-                    if (linePair.size() == 1
-                        && linePair.get(0).getTouchTypeEnum() == TouchType.OFF
-                    ) {
-                        ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
-                        updateSummaryLine(resultLine);
-                    }
-
-                    if (linePair.size() == 2
-                        && linePair.get(0).getTouchTypeEnum() == linePair.get(1).getTouchTypeEnum()
-                    ) {
-                        ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
-                        updateSummaryLine(resultLine);
-                    }
-
                     if (linePair.size() == 2) {
-                        if (linePair.get(0).getStopId().equals(linePair.get(1).getStopId())) {
-                            ResultLine resultLine = writeTrip(successSequenceWriter, linePair, TripStatus.CANCELLED);
-                            updateSummaryLine(resultLine);
+                        InputLine firstLine = linePair.get(0);
+                        InputLine secondLine = linePair.get(1);
+                        if (firstLine.getKey().equals(secondLine.getKey())) {
+                            if (firstLine.getStopId().equals(secondLine.getStopId())) {
+                                ResultLine resultLine = writeTrip(successSequenceWriter, linePair, TripStatus.CANCELLED);
+                                updateSummaryLine(resultLine);
+                            } else {
+                                if (firstLine.getTouchTypeEnum() == TouchType.ON && secondLine.getTouchTypeEnum() == TouchType.OFF) {
+                                    ResultLine resultLine = writeTrip(successSequenceWriter, linePair, TripStatus.COMPLETED);
+                                    updateSummaryLine(resultLine);
+                                } else {
+                                    ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
+                                    updateSummaryLine(resultLine);
+                                }
+                            }
                         } else {
-                            ResultLine resultLine = writeTrip(successSequenceWriter, linePair, TripStatus.COMPLETED);
+                            ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
                             updateSummaryLine(resultLine);
                         }
                     }
