@@ -7,18 +7,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequiredArgsConstructor
-public class OrderController {
+public class TouchController {
 
     private final ToucherService toucherService;
 
-    @PostMapping(value = "/views/{viewId}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<TouchResponse> createOrder(@RequestParam("file") MultipartFile file) {
-        // TODO Implement later
-        toucherService.process();
-        TouchResponse touchRepsonse = null;
-        return ResponseEntity.ok(touchRepsonse);
+    @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<StreamingResponseBody> process(@RequestParam("file") MultipartFile file) {
+        return toucherService.process(file);
     }
 }

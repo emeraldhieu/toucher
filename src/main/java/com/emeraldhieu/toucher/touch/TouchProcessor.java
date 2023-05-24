@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -78,7 +80,8 @@ public class TouchProcessor {
         }
     }
 
-    public void process(File inputFile, File outputFile, File failureOutputFile, File summaryOutputFile) {
+    public void process(InputStream inputStream, OutputStream tripOutputStream, OutputStream failureOutputStream,
+                        OutputStream summaryOutputStream) {
         CsvMapper inputMapper = new CsvMapper();
         inputMapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
         CsvSchema inputSchema = inputMapper
@@ -89,14 +92,10 @@ public class TouchProcessor {
         ObjectWriter outputObjectWriter = getObjectWriter(ResultLine.class);
         ObjectWriter summaryObjectWriter = getObjectWriter(SummaryLine.class);
 
-        try (FileInputStream fileInputStream = new FileInputStream(inputFile);
-             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, charset);
-             FileOutputStream successFileOutputStream = new FileOutputStream(outputFile);
-             SequenceWriter successSequenceWriter = outputObjectWriter.writeValues(successFileOutputStream);
-             FileOutputStream failureFileOutputStream = new FileOutputStream(failureOutputFile);
-             SequenceWriter failureSequenceWriter = outputObjectWriter.writeValues(failureFileOutputStream);
-             FileOutputStream summaryFileOutputStream = new FileOutputStream(summaryOutputFile);
-             SequenceWriter summarySequenceWriter = summaryObjectWriter.writeValues(summaryFileOutputStream)) {
+        try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset);
+             SequenceWriter successSequenceWriter = outputObjectWriter.writeValues(tripOutputStream);
+             SequenceWriter failureSequenceWriter = outputObjectWriter.writeValues(failureOutputStream);
+             SequenceWriter summarySequenceWriter = summaryObjectWriter.writeValues(summaryOutputStream)) {
 
             MappingIterator<InputLine> csvIterator = inputMapper.readerFor(InputLine.class)
                 .with(inputSchema)
@@ -152,6 +151,17 @@ public class TouchProcessor {
 
             writeSummaryLines(summarySequenceWriter);
 
+        } catch (IOException e) {
+            throw new TouchProcessorException("Can't process the file", e);
+        }
+    }
+
+    public void process(File inputFile, File tripFile, File failureOutputFile, File summaryOutputFile) {
+        try (FileInputStream fileInputStream = new FileInputStream(inputFile);
+             FileOutputStream tripOutputStream = new FileOutputStream(tripFile);
+             FileOutputStream failureOutputStream = new FileOutputStream(failureOutputFile);
+             FileOutputStream summaryOutputStream = new FileOutputStream(summaryOutputFile)) {
+            process(fileInputStream, tripOutputStream, failureOutputStream, summaryOutputStream);
         } catch (IOException e) {
             throw new TouchProcessorException("Can't process the file", e);
         }
@@ -343,7 +353,7 @@ public class TouchProcessor {
             ResultLine resultLine = ResultLine.builder()
                 .started(touchType == TouchType.ON ? line.getDateTimeUtc() : null)
                 .finished(touchType == TouchType.OFF ? line.getDateTimeUtc() : null)
-                .fromStopId(touchType == TouchType.ON ?  line.getStopId() : null)
+                .fromStopId(touchType == TouchType.ON ? line.getStopId() : null)
                 .toStopId(touchType == TouchType.OFF ? line.getStopId() : null)
                 .companyId(line.getCompanyId())
                 .busId(line.getBusId())

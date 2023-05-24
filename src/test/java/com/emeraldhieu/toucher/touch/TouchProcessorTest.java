@@ -24,7 +24,6 @@ class TouchProcessorTest {
 
     private TouchProcessor touchProcessor;
 
-
     @BeforeEach
     public void setUp() {
         touchProcessor = new TouchProcessor();
