@@ -89,6 +89,22 @@ class TouchProcessorTest {
     }
 
     @Test
+    public void givenTwoInvalidStopId_whenProcess_thenReturnInvalidStopId() {
+        // GIVEN
+        String fileName = "twoSameKeyInvalidStopIds.csv";
+        File inputFile = getInputFile(fileName);
+        String expectedFailureOutputContent = getFailureOutputContent(fileName);
+        File failureOutputFile = getOutputFile();
+
+        // WHEN
+        touchProcessor.processFailure(inputFile, failureOutputFile);
+
+        // THEN
+        String failureOutputContent = getOutputContent(failureOutputFile);
+        assertEquals(expectedFailureOutputContent, failureOutputContent);
+    }
+
+    @Test
     public void givenOneOnTouch_whenProcess_thenReturnOneIncompleteTrip() {
         // GIVEN
         String fileName = "oneOnTouch.csv";

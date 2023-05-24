@@ -118,14 +118,8 @@ public class TouchProcessor {
                     if (linePair.size() == 2
                         && linePair.get(0).getTouchTypeEnum() == linePair.get(1).getTouchTypeEnum()
                     ) {
-                        if (linePair.get(0).getKey().equals(linePair.get(1).getKey())) {
-                            ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
-                            linePair.remove(line); // Remove the next same-key-same-touch-type touch
-                            updateSummaryLine(resultLine);
-                        } else {
-                            ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
-                            updateSummaryLine(resultLine);
-                        }
+                        ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
+                        updateSummaryLine(resultLine);
                     }
 
                     if (linePair.size() == 2) {
