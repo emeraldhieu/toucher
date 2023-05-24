@@ -37,11 +37,11 @@ class TouchProcessorTest {
     public void givenCsvThatDoesNotHaveAnyRow_whenProcess_thenThrowsException() {
         // GIVEN
         File inputFile = createEmptyFile();
-        File outputFile = getOutputFile();
+        File tripOutputFile = getTempFile();
 
         // WHEN and THEN
         assertThrows(TouchProcessorException.class,
-            () -> touchProcessor.process(inputFile, outputFile));
+            () -> touchProcessor.process(inputFile, tripOutputFile));
     }
 
     @Test
@@ -49,11 +49,11 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "headerOnly.csv";
         File inputFile = getInputFile(fileName);
-        File outputFile = getOutputFile();
+        File tripOutputFile = getTempFile();
 
         // WHEN
         assertThrows(TouchProcessorException.class,
-            () -> touchProcessor.process(inputFile, outputFile));
+            () -> touchProcessor.process(inputFile, tripOutputFile));
     }
 
     @Test
@@ -61,15 +61,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "invalidTouchType.csv";
         File inputFile = getInputFile(fileName);
-        String expectedFailureOutputContent = getFailureOutputContent(fileName);
-        File failureOutputFile = getOutputFile();
+        String expectedFailureContent = getFailureContent(fileName);
+        File failureOutputFile = getTempFile();
 
         // WHEN
         touchProcessor.processFailure(inputFile, failureOutputFile);
 
         // THEN
-        String failureOutputContent = getOutputContent(failureOutputFile);
-        assertEquals(expectedFailureOutputContent, failureOutputContent);
+        String failureContent = getContent(failureOutputFile);
+        assertEquals(expectedFailureContent, failureContent);
     }
 
     @Test
@@ -77,31 +77,36 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "invalidStopId.csv";
         File inputFile = getInputFile(fileName);
-        String expectedFailureOutputContent = getFailureOutputContent(fileName);
-        File failureOutputFile = getOutputFile();
+        String expectedFailureContent = getFailureContent(fileName);
+        File failureOutputFile = getTempFile();
 
         // WHEN
         touchProcessor.processFailure(inputFile, failureOutputFile);
 
         // THEN
-        String failureOutputContent = getOutputContent(failureOutputFile);
-        assertEquals(expectedFailureOutputContent, failureOutputContent);
+        String failureContent = getContent(failureOutputFile);
+        assertEquals(expectedFailureContent, failureContent);
     }
 
     @Test
     public void givenTwoInvalidStopId_whenProcess_thenReturnInvalidStopId() {
         // GIVEN
-        String fileName = "twoSameKeyInvalidStopIds.csv";
+        String fileName = "invalidStopIdAndOffTouch.csv";
         File inputFile = getInputFile(fileName);
-        String expectedFailureOutputContent = getFailureOutputContent(fileName);
-        File failureOutputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
+        String expectedFailureContent = getFailureContent(fileName);
+        File failureOutputFile = getTempFile();
+        File summaryOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.processFailure(inputFile, failureOutputFile);
+        touchProcessor.process(inputFile, tripOutputFile, failureOutputFile, summaryOutputFile);
 
         // THEN
-        String failureOutputContent = getOutputContent(failureOutputFile);
-        assertEquals(expectedFailureOutputContent, failureOutputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
+        String failureContent = getContent(failureOutputFile);
+        assertEquals(expectedFailureContent, failureContent);
     }
 
     @Test
@@ -109,15 +114,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "oneOnTouch.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -125,15 +130,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "twoSameKeyOnTouches.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -141,15 +146,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "twoDifferentKeyOnTouches.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -157,15 +162,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "oneOffTouch.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -173,15 +178,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "twoSameKeyOffTouches.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -189,15 +194,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "twoDifferentKeyOffTouches.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -205,15 +210,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "twoSameStopTouches.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -221,15 +226,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "twoPairsOfSameStopTouches.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -237,15 +242,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "betweenAAndB.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -253,15 +258,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "betweenBAndA.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -269,15 +274,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "betweenBAndC.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -285,15 +290,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "betweenCAndB.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -301,15 +306,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "betweenAAndC.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -317,15 +322,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "betweenCAndA.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -333,15 +338,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "twoTrips.csv";
         File inputFile = getInputFile(fileName);
-        String expectedContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedTripContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String outputContent = getOutputContent(outputFile);
-        assertEquals(expectedContent, outputContent);
+        String tripContent = getContent(tripOutputFile);
+        assertEquals(expectedTripContent, tripContent);
     }
 
     @Test
@@ -349,15 +354,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "twoTrips.csv";
         File inputFile = getInputFile(fileName);
-        String expectedSummaryOutputContent = getSummaryOutputContent(fileName);
-        File summaryOutputFile = getOutputFile();
+        String expectedSummaryContent = getSummaryContent(fileName);
+        File summaryOutputFile = getTempFile();
 
         // WHEN
         touchProcessor.processSummary(inputFile, summaryOutputFile);
 
         // THEN
-        String summaryOutputContent = getOutputContent(summaryOutputFile);
-        assertEquals(expectedSummaryOutputContent, summaryOutputContent);
+        String summaryContent = getContent(summaryOutputFile);
+        assertEquals(expectedSummaryContent, summaryContent);
     }
 
     @Test
@@ -365,15 +370,15 @@ class TouchProcessorTest {
         // GIVEN
         String fileName = "touchDataImproved.csv";
         File inputFile = getInputFile(fileName);
-        String expectedOutputContent = getExpectedOutputFileContent(fileName);
-        File outputFile = getOutputFile();
+        String expectedOutputContent = getTripContent(fileName);
+        File tripOutputFile = getTempFile();
 
         // WHEN
-        touchProcessor.process(inputFile, outputFile);
+        touchProcessor.process(inputFile, tripOutputFile);
 
         // THEN
-        String summaryOutputContent = getOutputContent(outputFile);
-        assertEquals(expectedOutputContent, summaryOutputContent);
+        String summaryContent = getContent(tripOutputFile);
+        assertEquals(expectedOutputContent, summaryContent);
     }
 
     @SneakyThrows
@@ -399,17 +404,17 @@ class TouchProcessorTest {
         }
     }
 
-    private String getExpectedOutputFileContent(String fileName) {
+    private String getTripContent(String fileName) {
         String directory = "csv/trip";
         return getFileContent(directory, fileName);
     }
 
-    private String getFailureOutputContent(String fileName) {
+    private String getFailureContent(String fileName) {
         String directory = "csv/failure";
         return getFileContent(directory, fileName);
     }
 
-    private String getSummaryOutputContent(String fileName) {
+    private String getSummaryContent(String fileName) {
         String directory = "csv/summary";
         return getFileContent(directory, fileName);
     }
@@ -428,15 +433,15 @@ class TouchProcessorTest {
     }
 
     @SneakyThrows
-    private File getOutputFile() {
+    private File getTempFile() {
         File tempFile = File.createTempFile(UUID.randomUUID().toString(), null);
         tempFile.deleteOnExit();
         return tempFile;
     }
 
     @SneakyThrows
-    private String getOutputContent(File outputFile) {
-        return Files.readAllLines(outputFile.toPath()).stream()
+    private String getContent(File file) {
+        return Files.readAllLines(file.toPath()).stream()
             .collect(Collectors.joining(""));
     }
 }

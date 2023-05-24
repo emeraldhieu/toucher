@@ -115,6 +115,13 @@ public class TouchProcessor {
 
                     linePair.add(line);
 
+                    if (linePair.size() == 1
+                        && linePair.get(0).getTouchTypeEnum() == TouchType.OFF
+                    ) {
+                        ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
+                        updateSummaryLine(resultLine);
+                    }
+
                     if (linePair.size() == 2
                         && linePair.get(0).getTouchTypeEnum() == linePair.get(1).getTouchTypeEnum()
                     ) {
