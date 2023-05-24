@@ -48,7 +48,7 @@ public class TouchProcessor {
      */
     private final Map<SummaryLine.Key, SummaryLine> summaryLinesByKey = new HashMap<>();
 
-    public void process(File inputFile, File outputFile) {
+    void process(File inputFile, File outputFile) {
         try {
             File failureTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
             File summaryTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
@@ -58,7 +58,7 @@ public class TouchProcessor {
         }
     }
 
-    public void processFailure(File inputFile, File failureFile) {
+    void processFailure(File inputFile, File failureFile) {
         try {
             File outputTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
             File summaryTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
@@ -68,7 +68,7 @@ public class TouchProcessor {
         }
     }
 
-    public void processSummary(File inputFile, File summaryFile) {
+    void processSummary(File inputFile, File summaryFile) {
         try {
             File outputTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
             File failureTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
