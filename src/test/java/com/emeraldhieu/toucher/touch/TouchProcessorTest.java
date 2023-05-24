@@ -105,9 +105,25 @@ class TouchProcessorTest {
     }
 
     @Test
-    public void givenTwoOnTouches_whenProcess_thenReturnOneIncompleteTrip() {
+    public void givenTwoSameKeyOnTouches_whenProcess_thenReturnOneIncompleteTrip() {
         // GIVEN
-        String fileName = "twoOnTouches.csv";
+        String fileName = "twoSameKeyOnTouches.csv";
+        File inputFile = getInputFile(fileName);
+        String expectedContent = getExpectedOutputFileContent(fileName);
+        File outputFile = getOutputFile();
+
+        // WHEN
+        touchProcessor.process(inputFile, outputFile);
+
+        // THEN
+        String outputContent = getOutputContent(outputFile);
+        assertEquals(expectedContent, outputContent);
+    }
+
+    @Test
+    public void givenTwoDifferentKeyOnTouches_whenProcess_thenReturnOneIncompleteTrip() {
+        // GIVEN
+        String fileName = "twoDifferentKeyOnTouches.csv";
         File inputFile = getInputFile(fileName);
         String expectedContent = getExpectedOutputFileContent(fileName);
         File outputFile = getOutputFile();
@@ -137,9 +153,25 @@ class TouchProcessorTest {
     }
 
     @Test
-    public void givenTwoOffTouches_whenProcess_thenReturnOneIncompleteTrip() {
+    public void givenTwoSameKeyOffTouches_whenProcess_thenReturnOneIncompleteTrip() {
         // GIVEN
-        String fileName = "twoOffTouches.csv";
+        String fileName = "twoSameKeyOffTouches.csv";
+        File inputFile = getInputFile(fileName);
+        String expectedContent = getExpectedOutputFileContent(fileName);
+        File outputFile = getOutputFile();
+
+        // WHEN
+        touchProcessor.process(inputFile, outputFile);
+
+        // THEN
+        String outputContent = getOutputContent(outputFile);
+        assertEquals(expectedContent, outputContent);
+    }
+
+    @Test
+    public void givenTwoDifferentKeyOffTouches_whenProcess_thenReturnOneIncompleteTrip() {
+        // GIVEN
+        String fileName = "twoDifferentKeyOffTouches.csv";
         File inputFile = getInputFile(fileName);
         String expectedContent = getExpectedOutputFileContent(fileName);
         File outputFile = getOutputFile();
@@ -310,6 +342,22 @@ class TouchProcessorTest {
         // THEN
         String summaryOutputContent = getOutputContent(summaryOutputFile);
         assertEquals(expectedSummaryOutputContent, summaryOutputContent);
+    }
+
+    @Test
+    public void givenFoo_whenProcessSummary_thenReturnBar() {
+        // GIVEN
+        String fileName = "touchDataImproved.csv";
+        File inputFile = getInputFile(fileName);
+        String expectedOutputContent = getExpectedOutputFileContent(fileName);
+        File outputFile = getOutputFile();
+
+        // WHEN
+        touchProcessor.process(inputFile, outputFile);
+
+        // THEN
+        String summaryOutputContent = getOutputContent(outputFile);
+        assertEquals(expectedOutputContent, summaryOutputContent);
     }
 
     @SneakyThrows

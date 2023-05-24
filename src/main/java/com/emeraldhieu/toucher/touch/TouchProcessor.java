@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -42,13 +39,10 @@ public class TouchProcessor {
     // Assume the CSV delimiter is comma
     private CsvDelimiter csvDelimiter = CsvDelimiter.COMMA;
 
-    private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-    private static DateTimeFormatter summaryDateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
     /**
      * A map of summary lines grouped by keys. Key is composed of date, companyId, and busId.
      */
-    private final Map<SummaryLine.Key, SummaryLine> summaryLinesByKey = new HashMap<>();
+    private final Map<Key, SummaryLine> summaryLinesByKey = new HashMap<>();
 
     void process(File inputFile, File outputFile) {
         try {
@@ -119,13 +113,20 @@ public class TouchProcessor {
                         .build();
                     validateStopId(failureSequenceWriter, line);
 
-                    if (linePair.size() == 1
-                        && linePair.get(0).getTouchTypeEnum() == line.getTouchTypeEnum()) {
-                        ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
-                        updateSummaryLine(resultLine);
-                    }
-
                     linePair.add(line);
+
+                    if (linePair.size() == 2
+                        && linePair.get(0).getTouchTypeEnum() == linePair.get(1).getTouchTypeEnum()
+                    ) {
+                        if (linePair.get(0).getKey().equals(linePair.get(1).getKey())) {
+                            ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
+                            linePair.remove(line); // Remove the next same-key-same-touch-type touch
+                            updateSummaryLine(resultLine);
+                        } else {
+                            ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
+                            updateSummaryLine(resultLine);
+                        }
+                    }
 
                     if (linePair.size() == 2) {
                         if (linePair.get(0).getStopId().equals(linePair.get(1).getStopId())) {
@@ -183,7 +184,7 @@ public class TouchProcessor {
     }
 
     private void writeSummaryLines(SequenceWriter summarySequenceWriter) {
-        List<SummaryLine.Key> sortedKeys = getSortedKeyOfSummaryLines();
+        List<Key> sortedKeys = getSortedKeyOfSummaryLines();
         sortedKeys.forEach(key -> {
             SummaryLine summaryLine = summaryLinesByKey.get(key);
             try {
@@ -194,27 +195,18 @@ public class TouchProcessor {
         });
     }
 
-    private List<SummaryLine.Key> getSortedKeyOfSummaryLines() {
-        Comparator<SummaryLine.Key> keyComparator = Comparator.comparing(SummaryLine.Key::getDate)
-            .thenComparing(SummaryLine.Key::getCompanyId)
-            .thenComparing(SummaryLine.Key::getBusId);
-        List<SummaryLine.Key> sortedSummaryDates = summaryLinesByKey.keySet().stream()
+    private List<Key> getSortedKeyOfSummaryLines() {
+        Comparator<Key> keyComparator = Comparator.comparing(Key::getDate)
+            .thenComparing(Key::getCompanyId)
+            .thenComparing(Key::getBusId);
+        List<Key> sortedSummaryDates = summaryLinesByKey.keySet().stream()
             .sorted(keyComparator)
             .collect(Collectors.toList());
         return sortedSummaryDates;
     }
 
     private void updateSummaryLine(ResultLine resultLine) {
-        // Assume the summary's date is started date
-        LocalDateTime dateTime = resultLine.getStarted() != null
-            ? LocalDateTime.parse(resultLine.getStarted(), dateTimeFormatter)
-            : LocalDateTime.parse(resultLine.getFinished(), dateTimeFormatter);
-        String date = summaryDateTimeFormatter.format(dateTime);
-        SummaryLine.Key key = SummaryLine.Key.builder()
-            .date(date)
-            .companyId(resultLine.getCompanyId())
-            .busId(resultLine.getBusId())
-            .build();
+        Key key = resultLine.getKey();
         if (summaryLinesByKey.containsKey(key)) {
             SummaryLine summaryLine = summaryLinesByKey.get(key);
             SummaryLine updatedSummaryLine = summaryLine.toBuilder()
@@ -232,7 +224,7 @@ public class TouchProcessor {
             summaryLinesByKey.put(key, updatedSummaryLine);
         } else {
             SummaryLine summaryLine = SummaryLine.builder()
-                .date(date)
+                .date(resultLine.getSummaryDate())
                 .companyId(resultLine.getCompanyId())
                 .busId(resultLine.getBusId())
                 .completeTripCount(resultLine.getTripStatus() == TripStatus.COMPLETED
@@ -255,7 +247,6 @@ public class TouchProcessor {
                                  TripStatus tripStatus) {
         String started = linePair.get(0).getDateTimeUtc();
         String finished = linePair.get(1).getDateTimeUtc();
-        long seconds = getSeconds(started, finished);
         String fromStopId = linePair.get(0).getStopId();
         String toStopId = linePair.get(1).getStopId();
         double chargeAmount = StopCharge.getCharge(fromStopId, toStopId);
@@ -265,7 +256,6 @@ public class TouchProcessor {
         ResultLine resultLine = ResultLine.builder()
             .started(started)
             .finished(finished)
-            .durationSeconds(seconds)
             .fromStopId(fromStopId)
             .toStopId(toStopId)
             .chargeAmount(chargeAmount)
@@ -317,12 +307,6 @@ public class TouchProcessor {
         linePair.remove(firstLine);
 
         return resultLine;
-    }
-
-    private long getSeconds(String started, String finished) {
-        LocalDateTime startedTime = LocalDateTime.parse(started, dateTimeFormatter);
-        LocalDateTime finishedTime = LocalDateTime.parse(finished, dateTimeFormatter);
-        return ChronoUnit.SECONDS.between(startedTime, finishedTime);
     }
 
     @SneakyThrows
