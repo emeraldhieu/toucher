@@ -120,8 +120,13 @@ public class TouchProcessor {
                         InputLine secondLine = linePair.get(1);
                         if (firstLine.getKey().equals(secondLine.getKey())) {
                             if (firstLine.getStopId().equals(secondLine.getStopId())) {
-                                ResultLine resultLine = writeTrip(successSequenceWriter, linePair, TripStatus.CANCELLED);
-                                updateSummaryLine(resultLine);
+                                if (firstLine.getTouchTypeEnum() == TouchType.ON && secondLine.getTouchTypeEnum() == TouchType.OFF) {
+                                    ResultLine resultLine = writeTrip(successSequenceWriter, linePair, TripStatus.CANCELLED);
+                                    updateSummaryLine(resultLine);
+                                } else {
+                                    ResultLine resultLine = writeIncompleteTrip(successSequenceWriter, linePair);
+                                    updateSummaryLine(resultLine);
+                                }
                             } else {
                                 if (firstLine.getTouchTypeEnum() == TouchType.ON && secondLine.getTouchTypeEnum() == TouchType.OFF) {
                                     ResultLine resultLine = writeTrip(successSequenceWriter, linePair, TripStatus.COMPLETED);

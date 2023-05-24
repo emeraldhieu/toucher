@@ -1,0 +1,3 @@
+"Started","Finished","DurationSec","FromStopId","ToStopId","ChargeAmount","CompanyId","BusId","HashedPan","Status"
+"16-05-2023 12:15:00",,,"StopA",,8.45,"Company1","Bus10","3c87ca642cbbccd6b7fd707fdb6bf028af3f81c7df0ce52e9c07559380f1647b","INCOMPLETE"
+"16-05-2023 12:25:00",,,"StopA",,8.45,"Company1","Bus10","0c76660773e944bee6e1f95e09abe9ba9c6fef7aca27a0f675899f11677de827","INCOMPLETE"
