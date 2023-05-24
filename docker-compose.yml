@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  toucher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: toucher:1.0-SNAPSHOT
+    ports:
+      - "50001:8080"
