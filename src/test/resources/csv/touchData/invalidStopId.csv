@@ -1,0 +1,2 @@
+ID, DateTimeUTC, TouchType, StopID, CompanyID, BusID, PAN
+1,16-05-2023 12:15:00, ON, INVALID, Company1, Bus10, 2255550000666662
