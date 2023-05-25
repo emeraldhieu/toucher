@@ -1,6 +1,6 @@
 # Toucher
 
-Toucher is a travelcard system simulation like [London's Oyster card](https://en.wikipedia.org/wiki/Oyster_card). It takes a CSV file that contains touches, processes the content and produces three output files including successful trips, unprocessable trips, and trip summary.
+A travelcard system simulation that processes touch data and produces aggregation information such as successful trips, unprocessable data, and trip summary.
 
 ### 1) Hypothetical travel system
 
