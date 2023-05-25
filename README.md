@@ -1,6 +1,6 @@
 # Toucher
 
-Toucher is a travelcard system simulation like [Oyster card  used in London](https://en.wikipedia.org/wiki/Oyster_card). It takes a CSV file that contains touches, processes the content and produces three output files including successful trips, unprocessable trips, and trip summary.
+Toucher is a travelcard system simulation like [London's Oyster card](https://en.wikipedia.org/wiki/Oyster_card). It takes a CSV file that contains touches, processes the content and produces three output files including successful trips, unprocessable trips, and trip summary.
 
 ### 1) Hypothetical travel system
 
@@ -9,9 +9,9 @@ Toucher is a travelcard system simulation like [Oyster card  used in London](htt
 + Touch On: On boarding a bus, passengers taps their credit card (identified by a Hashed Number called as Primary Account Number) which is called as Touch On.
 + Touch Off: When passenger gets off the bus, they tap their card again which is called a Touch Off.
 + Amount to Charge: The amount to charge the passenger will be determined where they Touch On and where the Touch Off. The amount is determined as follows:
-    + Trip Between Stop A and Stop B costs $4.50
-    + Trip Between Stop B and Stop C costs $6.25
-    + Trip Between Stop A and Stop C costs $8.45
+  + Trip Between Stop A and Stop B costs $4.50
+  + Trip Between Stop B and Stop C costs $6.25
+  + Trip Between Stop A and Stop C costs $8.45
 + Travel Direction:  The above Amount to Charge applies to travel in either direction. This means that the same amount is charged if a passenger Touch On at Stop A and Touch Off at Stop B OR they can Touch On at Stop B and Touch Off at Stop A.
 
 #### Types of Trips
@@ -24,7 +24,7 @@ Toucher is a travelcard system simulation like [Oyster card  used in London](htt
 
 Given an input file `touchData.csv` in CSV format containing the Touch On and Touch Off data per line, the app will produce 3 output files as defined below.
 
-![](images/toucher.png)
+<img src="https://github.com/emeraldhieu/toucher/blob/master/images/toucher.png" width="90%">
 
 `touchData.csv`
 ```
@@ -61,19 +61,19 @@ A summary of the trips will be written to a file called `tripSummary.csv`. The f
 ```
 
 #### Assumptions
-+ Touch ON has to happen before Touch OFF in case of the same date, company, and bus
++ Touch ON has to happen before Touch OFF in case of the same date, companyId, and busId
 + Summary's date is start date aka started
 + Charset of the input file is UTF-8
 + CSV delimiter is comma
-+ Hashed PAN is created by Hash256(PAN of fromStop + "_" + PAN of toStop)
++ Hashed PAN is created by the formula `Hash256(PAN of fromStop + "_" + PAN of toStop)`
 
-### 3) Solution
+### 3) Quickstart
 
 #### Prerequisites
 
 Java17, Maven, Docker Desktop
 
-#### Quickstart
+#### Run the app
 
 Check out the repo. At the project directory, build the app
 ```sh
@@ -88,7 +88,7 @@ docker compose up -d
 Process the file
 ```sh
 curl --location 'localhost:50001/files' \
---form 'file=@"csv/touchDataAllCases.csv"' > result.zip
+--form 'file=@"files/touchDataAllCases.csv"' > result.zip
 ```
 
 The output will be a ZIP file. Unzip it.
@@ -97,4 +97,12 @@ The output will be a ZIP file. Unzip it.
 unzip result.zip -d result
 ```
 
-Check the files `trip.csv`, `unprocessableTouchData.csv`, and `tripSummary.csv`.
+Well done! Check the files `trip.csv`, `unprocessableTouchData.csv`, and `tripSummary.csv`.
+
+### 4) Technical details
+
++ The app uses [Jackson Dataformat CSV ](https://github.com/FasterXML/jackson-dataformats-text/tree/2.16/csv) to parse the CSV input file
++ To determine a pair of touches ON and OFF, a composite key of date, companyId, and busId is used for comparision
+  + [A color-highlighted XLSX file](files/touchDataAllCases.xlsx) is included for you to see exactly which lines are paired
++ New routes with charges can be added to `RouteProvider`. For instance, "StopD to StopC costs 42$".
++ The programming approach is TDD. New cases can be covered by new unit tests.
