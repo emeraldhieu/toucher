@@ -23,7 +23,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -44,35 +43,19 @@ public class TouchProcessor {
      */
     private final Map<Key, SummaryLine> summaryLinesByKey = new HashMap<>();
 
+    /**
+     * A mandatory field that provides routes for processing.
+     */
     private final RouteProvider routeProvider;
 
-    void process(File inputFile, File outputFile) {
-        try {
-            File failureTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
-            File summaryTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
-            process(inputFile, outputFile, failureTempFile, summaryTempFile);
+    public void process(File inputFile, File tripOputFile, File failureOutputFile, File summaryOutputFile) {
+        try (FileInputStream fileInputStream = new FileInputStream(inputFile);
+             FileOutputStream tripOutputStream = new FileOutputStream(tripOputFile);
+             FileOutputStream failureOutputStream = new FileOutputStream(failureOutputFile);
+             FileOutputStream summaryOutputStream = new FileOutputStream(summaryOutputFile)) {
+            process(fileInputStream, tripOutputStream, failureOutputStream, summaryOutputStream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    void processFailure(File inputFile, File failureFile) {
-        try {
-            File outputTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
-            File summaryTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
-            process(inputFile, outputTempFile, failureFile, summaryTempFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    void processSummary(File inputFile, File summaryFile) {
-        try {
-            File outputTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
-            File failureTempFile = File.createTempFile(UUID.randomUUID().toString(), null);
-            process(inputFile, outputTempFile, failureTempFile, summaryFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TouchProcessorException("Can't process the file", e);
         }
     }
 
@@ -159,17 +142,6 @@ public class TouchProcessor {
 
             writeSummaryLines(summarySequenceWriter);
 
-        } catch (IOException e) {
-            throw new TouchProcessorException("Can't process the file", e);
-        }
-    }
-
-    public void process(File inputFile, File tripFile, File failureOutputFile, File summaryOutputFile) {
-        try (FileInputStream fileInputStream = new FileInputStream(inputFile);
-             FileOutputStream tripOutputStream = new FileOutputStream(tripFile);
-             FileOutputStream failureOutputStream = new FileOutputStream(failureOutputFile);
-             FileOutputStream summaryOutputStream = new FileOutputStream(summaryOutputFile)) {
-            process(fileInputStream, tripOutputStream, failureOutputStream, summaryOutputStream);
         } catch (IOException e) {
             throw new TouchProcessorException("Can't process the file", e);
         }
