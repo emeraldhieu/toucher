@@ -1,0 +1,2 @@
+"Started","Finished","DurationSec","FromStopId","ToStopId","ChargeAmount","CompanyId","BusId","HashedPan","Status"
+"16-05-2023 12:15:00",,,"StopA",,,"Company1","Bus10",,"Missing PAN"

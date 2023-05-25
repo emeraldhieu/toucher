@@ -114,6 +114,22 @@ class TouchProcessorTest {
     }
 
     @Test
+    public void givenMissingPan_whenProcess_thenReturnMissingPan() {
+        // GIVEN
+        String fileName = "missingPan.csv";
+        File inputFile = getInputFile(fileName);
+        String expectedFailureContent = getFailureContent(fileName);
+        File failureOutputFile = getTempFile();
+
+        // WHEN
+        touchProcessor.processFailure(inputFile, failureOutputFile);
+
+        // THEN
+        String failureContent = getContent(failureOutputFile);
+        assertEquals(expectedFailureContent, failureContent);
+    }
+
+    @Test
     public void givenOneOnTouch_whenProcess_thenReturnOneIncompleteTrip() {
         // GIVEN
         String fileName = "oneOnTouch.csv";

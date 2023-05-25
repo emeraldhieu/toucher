@@ -114,6 +114,7 @@ public class TouchProcessor {
                         .touchTypeEnum(touchType)
                         .build();
                     validateStopId(failureSequenceWriter, line);
+                    validatePan(failureSequenceWriter, line);
 
                     linePair.add(line);
 
@@ -353,5 +354,24 @@ public class TouchProcessor {
             failureSequenceWriter.write(resultLine);
             throw new TouchProcessorException(TripStatus.INVALID_STOP_ID.getMessage());
         }
+    }
+
+    @SneakyThrows
+    private String validatePan(SequenceWriter failureSequenceWriter, InputLine line) {
+        if (line.getPan().equals("")) {
+            TouchType touchType = line.getTouchTypeEnum();
+            ResultLine resultLine = ResultLine.builder()
+                .started(touchType == TouchType.ON ? line.getDateTimeUtc() : null)
+                .finished(touchType == TouchType.OFF ? line.getDateTimeUtc() : null)
+                .fromStopId(touchType == TouchType.ON ? line.getStopId() : null)
+                .toStopId(touchType == TouchType.OFF ? line.getStopId() : null)
+                .companyId(line.getCompanyId())
+                .busId(line.getBusId())
+                .tripStatus(TripStatus.MISSING_PAN)
+                .build();
+            failureSequenceWriter.write(resultLine);
+            throw new TouchProcessorException(TripStatus.MISSING_PAN.getMessage());
+        }
+        return line.getStopId();
     }
 }

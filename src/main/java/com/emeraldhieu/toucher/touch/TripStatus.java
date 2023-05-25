@@ -24,7 +24,9 @@ public enum TripStatus {
 
     INVALID_TOUCH_TYPE("invalidTouchType", "Invalid touch type"),
 
-    INVALID_STOP_ID("invalidStopId", "Invalid stop ID");
+    INVALID_STOP_ID("invalidStopId", "Invalid stop ID"),
+
+    MISSING_PAN("missingPan", "Missing PAN");
 
     private String keyword;
 
