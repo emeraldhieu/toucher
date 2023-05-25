@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A class that represents a composite key.
  */
 @Getter
-@Builder(toBuilder = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@RequiredArgsConstructor
 public class Key {
     @JsonProperty("Date")
     @EqualsAndHashCode.Include
