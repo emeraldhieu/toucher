@@ -71,7 +71,7 @@ A summary of the trips will be written to a file called `tripSummary.csv`. The f
 
 #### Prerequisites
 
-Java17, Maven, Docker Desktop
+Java 17, Maven, Docker Desktop
 
 #### Run the app
 
