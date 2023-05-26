@@ -61,11 +61,12 @@ A summary of the trips will be written to a file called `tripSummary.csv`. The f
 ```
 
 #### Assumptions
-+ Touch ON has to happen before Touch OFF in case of the same date, companyId, and busId
-+ Summary's date is start date aka started
++ Touch data is sorted by dateTimeUtc, companyId, and busId
++ Touch ON happens before Touch OFF in case of the same date, companyId, and busId
++ Summary's date is the "started" date
 + Charset of the input file is UTF-8
 + CSV delimiter is comma
-+ Hashed PAN is created by the formula `Hash256(PAN of fromStop + "_" + PAN of toStop)`
++ Hashed PAN is created by the formula `Hash256(panOfFromStop + "_" + panOfToStop)`
 
 ### 3) Quickstart
 
